@@ -1,0 +1,69 @@
+---
+title: CrawFloat Monitoring
+layout: default
+content: |
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>CrawFloat Monitoring</title>
+      <style>
+          body { font-family: Arial, sans-serif; }
+          .container { text-align: center; padding: 20px; }
+          .data-block { padding: 10px; }
+      </style>
+  </head>
+  <body>
+      <div class="container">
+          <h1>CrawFloat Sensor Data</h1>
+          <div id="sensorData" class="data-block"></div>
+          <div id="weatherData" class="data-block"></div>
+      </div>
+
+      <script>
+          // Example ESP32 Data (replace with actual data from Firebase or your server)
+          const sensorData = {
+              temperature: 24,
+              depth: 1.5,
+              pH: 7.4,
+              O2: 8.1,
+              TDS: 450,
+          };
+
+          // Display Sensor Data
+          const sensorDiv = document.getElementById('sensorData');
+          sensorDiv.innerHTML = `
+              <h2>Sensor Readings</h2>
+              <p>Water Temperature: ${sensorData.temperature}°C</p>
+              <p>Depth: ${sensorData.depth} feet</p>
+              <p>pH Level: ${sensorData.pH}</p>
+              <p>Oxygen Level: ${sensorData.O2} mg/L</p>
+              <p>TDS: ${sensorData.TDS} ppm</p>
+          `;
+
+          // Weather Data
+          const weatherDiv = document.getElementById('weatherData');
+          const apiKey = 'YOUR_API_KEY'; // Insert your API Key here
+          const city = 'New Orleans'; // Replace with user's input or a default city
+          const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+          // Fetch Weather Data
+          fetch(weatherApiUrl)
+              .then(response => response.json())
+              .then(data => {
+                  const weatherInfo = `
+                      <h2>Current Weather in ${city}</h2>
+                      <p>Temperature: ${data.main.temp}°C</p>
+                      <p>Humidity: ${data.main.humidity}%</p>
+                      <p>Weather: ${data.weather[0].description}</p>
+                  `;
+                  weatherDiv.innerHTML = weatherInfo;
+              })
+              .catch(error => {
+                  weatherDiv.innerHTML = `<p>Could not load weather data.</p>`;
+                  console.error('Error fetching weather data:', error);
+              });
+      </script>
+  </body>
+  </html>
