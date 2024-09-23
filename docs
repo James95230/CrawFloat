@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrawFloat Monitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .sensor-data {
+      margin: 20px 0;
+    }
+    .sensor-data div {
+      margin: 10px 0;
+    }
+    .sensor-label {
+      font-weight: bold;
+    }
+    .input-container {
+      margin: 20px 0;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 80%;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .weather-info {
+      margin-top: 20px;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>CrawFloat Monitor</h1>
+
+  <div class="sensor-data">
+    <div>
+      <span class="sensor-label">Temperature:</span> 
+      <span id="temperature">Loading...</span> °C
+    </div>
+    <div>
+      <span class="sensor-label">Depth:</span> 
+      <span id="depth">Loading...</span> feet
+    </div>
+    <div>
+      <span class="sensor-label">pH Level:</span> 
+      <span id="ph">Loading...</span>
+    </div>
+    <div>
+      <span class="sensor-label">O2 Level:</span> 
+      <span id="oxygen">Loading...</span> mg/L
+    </div>
+    <div>
+      <span class="sensor-label">TDS Level:</span> 
+      <span id="tds">Loading...</span> ppm
+    </div>
+  </div>
+
+  <div class="sensor-data">
+    <div>
+      <span class="sensor-label">Date:</span> 
+      <span id="current-date">Loading...</span>
+    </div>
+    <div>
+      <span class="sensor-label">Time:</span> 
+      <span id="current-time">Loading...</span>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <h3>Check Weather</h3>
+    <input type="text" id="location" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+  </div>
+
+  <div class="weather-info" id="weather-info">
+    <p>Weather data will be displayed here.</p>
+  </div>
+</div>
+
+<footer>
+  © 2024 CrawFloat Project. All rights reserved.
+</footer>
+
+<script>
+  // Simulate sensor data retrieval
+  function loadSensorData() {
+    // Example static data (this will come from ESP32 in real use)
+    document.getElementById('temperature').innerText = "22.5";
+    document.getElementById('depth').innerText = "1.8";
+    document.getElementById('ph').innerText = "7.4";
+    document.getElementById('oxygen').innerText = "8.2";
+    document.getElementById('tds').innerText = "500";
+  }
+
+  // Function to update current date and time
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('current-date').innerText = now.toLocaleDateString();
+    document.getElementById('current-time').innerText = now.toLocaleTimeString();
+  }
+
+  // Call the functions on page load
+  loadSensorData();
+  updateTime();
+  setInterval(updateTime, 1000); // Update the time every second
+
+  // Fetch weather data from OpenWeatherMap API (replace 'YOUR_API_KEY' with your actual API key)
+  async function getWeather() {
+    const location = document.getElementById('location').value;
+    if (location) {
+      const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+      const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+
+      try {
+        const response = await fetch(weatherUrl);
+        if (response.ok) {
+          const weatherData = await response.json();
+          const weatherInfo = `
+            <p>Location: ${weatherData.name}</p>
+            <p>Temperature: ${weatherData.main.temp} °C</p>
+            <p>Weather: ${weatherData.weather[0].description}</p>
+          `;
+          document.getElementById('weather-info').innerHTML = weatherInfo;
+        } else {
+          document.getElementById('weather-info').innerHTML = '<p>Weather data not found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('weather-info').innerHTML = '<p>Error fetching weather data.</p>';
+      }
+    } else {
+      document.getElementById('weather-info').innerHTML = '<p>Please enter a location.</p>';
+    }
+  }
+</script>
+
+</body>
+</html>
